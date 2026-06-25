@@ -80,15 +80,33 @@ env vars adapt it to a remote host:
 
 ### 1. Put your config on the host (via SSH)
 
-The password stays as a `${...}` placeholder — the app resolves it from the
-container environment at load time, so no secret is written to this file:
+This file lives on the host, not in the repo (it's gitignored), so write it
+directly — there's nothing to `cp` from on the host. The password stays as a
+`${...}` placeholder; the app resolves it from the container environment at
+load time, so no secret is written to this file:
 
 ```bash
 sudo mkdir -p /opt/calendar-api
-sudo cp sources.yaml.example /opt/calendar-api/sources.yaml
-sudo nano /opt/calendar-api/sources.yaml   # fill in your real sources
+sudo tee /opt/calendar-api/sources.yaml > /dev/null <<'EOF'
+sources:
+  - type: ics_url
+    name: "Public Holidays"
+    url: "https://example.com/holidays.ics"
+
+  - type: caldav
+    name: "Nextcloud Personal"
+    url: "https://your-nextcloud.example.com/remote.php/dav/calendars/your-username/personal/"
+    username: "your-username"
+    password: "${NEXTCLOUD_APP_PASSWORD}"
+EOF
+sudo nano /opt/calendar-api/sources.yaml   # edit in your real sources
 sudo chmod 644 /opt/calendar-api/sources.yaml
 ```
+
+(If you'd rather start from the committed sample, copy the contents of
+`sources.yaml.example` from the repo on GitHub. The format reference is in
+the [Configuring](#configuring-a-nextcloud-calendar-recommended-approach-caldav)
+sections below.)
 
 ### 2. Create the stack in Portainer
 
