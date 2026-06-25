@@ -18,6 +18,9 @@ services:
       API_KEYS: ${API_KEYS}
       NEXTCLOUD_APP_PASSWORD: ${NEXTCLOUD_APP_PASSWORD:-}
       CALENDAR_CONFIG: /app/sources.yaml
+      # IANA timezone all event times are presented in (e.g. Europe/Berlin).
+      # Converts every source's events into one consistent zone. Defaults to UTC.
+      DISPLAY_TZ: ${DISPLAY_TZ:-UTC}
     volumes:
       # Mount your real sources.yaml from the host so it's never baked into
       # the image and you can edit it without rebuilding.

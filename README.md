@@ -126,6 +126,7 @@ sections below.)
    | `NEXTCLOUD_APP_PASSWORD` | your Nextcloud app password (only if using a caldav source) |
    | `SOURCES_FILE` | `/opt/calendar-api/sources.yaml` |
    | `HOST_PORT` | e.g. `8087` (optional; defaults to `8000`) |
+   | `DISPLAY_TZ` | IANA tz to show all event times in, e.g. `Europe/Berlin` (optional; defaults to `UTC`) |
 
 4. **Deploy.** Portainer clones the repo, builds the image from the
    Dockerfile, and starts the container. Use Portainer's container Logs view
@@ -234,7 +235,9 @@ blind.
   which sources are configured).
 - Config is loaded once at process start. Restart the container after
   editing `sources.yaml`.
-- Timezone handling: every event's start/end is normalized to a
-  timezone-aware UTC datetime so multiple sources sort together
-  correctly, regardless of each source's original timezone.
+- Timezone handling: every event's start/end is normalized to a single
+  timezone-aware zone (set via `DISPLAY_TZ`, default `UTC`) so multiple
+  sources sort together correctly and display consistently, regardless of
+  each source's original timezone. All-day events are anchored at midnight
+  in that zone so their calendar day is preserved.
 
