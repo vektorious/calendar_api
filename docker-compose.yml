@@ -6,7 +6,10 @@ services:
     container_name: calendar-api
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      # The container always listens on 8000 internally. The published HOST
+      # port is configurable to avoid clashes with other services — override
+      # with HOST_PORT (e.g. HOST_PORT=8087) locally or in Portainer.
+      - "${HOST_PORT:-8000}:8000"
     environment:
       # Comma-separated API keys. Generate strong ones, e.g.:
       #   python3 -c "import secrets; print(secrets.token_urlsafe(32))"

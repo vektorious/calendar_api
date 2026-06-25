@@ -66,21 +66,72 @@ uvicorn app.main:app --reload --port 8000
    curl -H "X-API-Key: your-key-from-.env" http://localhost:8000/today
    ```
 
-## Deploying with Portainer
+## Deploying with Portainer (repository stack)
 
-Same `docker-compose.yml` works as a Portainer **Stack**:
+The `docker-compose.yml` is parameterised so it runs unchanged as a
+Portainer **Repository stack** that builds straight from this Git repo. Two
+env vars adapt it to a remote host:
 
-1. In Portainer: Stacks → Add stack → paste the contents of `docker-compose.yml` (or point it at a Git repo containing this project).
-2. Add the environment variables (`API_KEYS`, `NEXTCLOUD_APP_PASSWORD`) under the stack's "Environment variables" section instead of a `.env` file.
-3. For `sources.yaml`, either:
-   - Mount it from a bind-mounted host path on the server (edit the `volumes:` line to point at that path), or
-   - Use a Portainer **Config** to inject it instead of a host file.
-4. Deploy. Use Portainer's container console / logs view in place of `docker logs`.
+- `SOURCES_FILE` — absolute path to your real `sources.yaml` on the host
+  (the gitignored config isn't in the repo checkout, and the default
+  `./sources.yaml` would resolve to Portainer's managed stack directory).
+- `HOST_PORT` — the published host port (defaults to `8000`). Set it to
+  avoid clashing with anything else on the host.
 
-If you build the image on your own machine and want to deploy a pre-built
-image instead of having the Portainer host build it, push it to a registry
-(Docker Hub, GHCR, a self-hosted registry) and change `build: .` to
-`image: yourregistry/calendar-api:latest` in `docker-compose.yml`.
+### 1. Put your config on the host (via SSH)
+
+The password stays as a `${...}` placeholder — the app resolves it from the
+container environment at load time, so no secret is written to this file:
+
+```bash
+sudo mkdir -p /opt/calendar-api
+sudo cp sources.yaml.example /opt/calendar-api/sources.yaml
+sudo nano /opt/calendar-api/sources.yaml   # fill in your real sources
+sudo chmod 644 /opt/calendar-api/sources.yaml
+```
+
+### 2. Create the stack in Portainer
+
+1. **Stacks → Add stack**, name it `calendar-api`.
+2. **Build method: Repository.**
+   - Repository URL: this repo's clone URL
+   - Reference: `refs/heads/main`
+   - Compose path: `docker-compose.yml`
+   - If the repo is private, enable Authentication and add a GitHub
+     username + personal access token.
+3. **Environment variables** (these feed the `${...}` substitutions in the
+   compose file — no `.env` needed):
+
+   | Name | Value |
+   |---|---|
+   | `API_KEYS` | your generated key(s), comma-separated |
+   | `NEXTCLOUD_APP_PASSWORD` | your Nextcloud app password (only if using a caldav source) |
+   | `SOURCES_FILE` | `/opt/calendar-api/sources.yaml` |
+   | `HOST_PORT` | e.g. `8087` (optional; defaults to `8000`) |
+
+4. **Deploy.** Portainer clones the repo, builds the image from the
+   Dockerfile, and starts the container. Use Portainer's container Logs view
+   in place of `docker logs`, and check the container reports `healthy`.
+
+### 3. Verify
+
+```bash
+curl http://SERVER_IP:HOST_PORT/health
+curl -H "X-API-Key: YOUR_KEY" http://SERVER_IP:HOST_PORT/today
+```
+
+### Updating later
+
+- **Calendars:** edit `/opt/calendar-api/sources.yaml` on the host and
+  restart the container (config is loaded once at startup).
+- **Code:** push to `main`, then use Portainer's **Pull and redeploy** to
+  rebuild from the latest commit.
+
+### Prebuilt image instead of building on the server
+
+If you'd rather not build on the Portainer host, build/push the image to a
+registry (GHCR, Docker Hub, a self-hosted registry) and change `build: .`
+to `image: yourregistry/calendar-api:latest` in `docker-compose.yml`.
 
 ## API key management
 
