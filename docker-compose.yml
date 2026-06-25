@@ -18,4 +18,10 @@ services:
     volumes:
       # Mount your real sources.yaml from the host so it's never baked into
       # the image and you can edit it without rebuilding.
-      - ./sources.yaml:/app/sources.yaml:ro
+      #
+      # Local dev defaults to ./sources.yaml next to this file. On a remote
+      # host (e.g. a Portainer repository stack, where the compose file lives
+      # in a managed checkout that does NOT contain your gitignored
+      # sources.yaml), set SOURCES_FILE to an absolute host path instead, e.g.
+      #   SOURCES_FILE=/opt/calendar-api/sources.yaml
+      - ${SOURCES_FILE:-./sources.yaml}:/app/sources.yaml:ro
