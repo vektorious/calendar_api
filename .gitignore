@@ -5,3 +5,7 @@ __pycache__/
 sources.yaml
 sources.yaml.local
 CLAUDE.md
+
+# Local-only notes / secrets, never committed
+*.local.md
+notes.local.md
