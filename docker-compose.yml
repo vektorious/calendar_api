@@ -1,0 +1,21 @@
+services:
+  calendar-api:
+    build: .
+    # If you push this image to a registry instead of building on the server,
+    # replace `build: .` with e.g. `image: yourregistry/calendar-api:latest`
+    container_name: calendar-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Comma-separated API keys. Generate strong ones, e.g.:
+      #   python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+      # Use one key per consumer (Terminus, your laptop, etc.) so you can
+      # revoke one without affecting the others.
+      API_KEYS: ${API_KEYS}
+      NEXTCLOUD_APP_PASSWORD: ${NEXTCLOUD_APP_PASSWORD:-}
+      CALENDAR_CONFIG: /app/sources.yaml
+    volumes:
+      # Mount your real sources.yaml from the host so it's never baked into
+      # the image and you can edit it without rebuilding.
+      - ./sources.yaml:/app/sources.yaml:ro

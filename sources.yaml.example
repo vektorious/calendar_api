@@ -1,0 +1,27 @@
+# Copy this to sources.yaml and fill in your real calendars.
+# sources.yaml is gitignored so your private calendar URLs never get committed.
+#
+# Add as many sources as you like — each one is queried in parallel and the
+# results are merged and sorted by start time.
+
+sources:
+  # --- Example: a public/shared .ics URL (Google Calendar export, an
+  #     Outlook/Office365 published calendar, a Nextcloud public share, etc.) ---
+  - type: ics_url
+    name: "Public Holidays"
+    url: "https://example.com/holidays.ics"
+
+  # --- Example: Nextcloud calendar via CalDAV (recommended — works with private calendars) ---
+  - type: caldav
+    name: "Nextcloud Personal"
+    url: "https://your-nextcloud.example.com/remote.php/dav/calendars/your-username/personal/"
+    username: "your-username"
+    password: "${NEXTCLOUD_APP_PASSWORD}"   # set this in your environment, don't hardcode it
+    # calendar_name: "Personal"             # optional, only needed if url points at the calendar home, not a single calendar
+
+  # --- Example: a second Nextcloud calendar, e.g. a shared "Work" calendar ---
+  # - type: caldav
+  #   name: "Nextcloud Work"
+  #   url: "https://your-nextcloud.example.com/remote.php/dav/calendars/your-username/work/"
+  #   username: "your-username"
+  #   password: "${NEXTCLOUD_APP_PASSWORD}"
