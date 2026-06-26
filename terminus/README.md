@@ -38,12 +38,16 @@ The template expects the API's day-grouped endpoint, exposed in Liquid as
 `weeks` uses `0` for padding cells (days outside the month); the template skips
 those and circles the cell matching `calendar.today`.
 
-## Font
+## Font & bars
 
-Uses the TRMNL framework's **default built-in font**. To switch to the `Classic`
-or `TRMNL` family, apply the framework's font-family class on the wrapper (the
-exact class is in the framework docs / visible in the Terminus preview). The
-layout fonts (sizes/weights) are in the scoped `<style>` block at the top.
+- **Font:** the scoped `<style>` sets `font-family: "Inter Variable", Inter,
+  …` — the framework's scalable Default font. (Don't switch to the bitmap
+  families NicoClean/TRMNL16 here: they only look right at the framework's
+  preset sizes, and this layout uses custom sizes, so they render badly.)
+- **Day bars:** each day row uses the framework's own `<div class="meta"></div>`
+  element for the gray dither bar — identical to the bars in other extensions.
+  It needs no custom CSS beyond spacing; the framework supplies the gray-70
+  dither (per the active screen mode).
 
 ## Where this lives / how it's shared
 
