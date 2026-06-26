@@ -7,7 +7,9 @@
 <div class="{{ extension.css_classes }}">
   <div class="view view--full">
     <style>
-      .ca-screen { display:flex; height:100%; box-sizing:border-box; padding:26px 12px 10px 36px; }
+      /* Inherit the framework's selected font (Default/Classic/TRMNL); never serif */
+      .ca-screen { display:flex; height:100%; box-sizing:border-box; padding:26px 12px 10px 36px;
+                   font-family:var(--font-base-font-family, "Inter Variable", Inter, system-ui, sans-serif); }
 
       /* Left: big "today" date + mini month calendar */
       .ca-today { width:200px; flex:0 0 200px; padding-right:30px; }
@@ -28,14 +30,12 @@
       .ca-dg     { display:flex; margin-bottom:22px; }
       .ca-dg:last-child { margin-bottom:0; }
       .ca-gut    { width:48px; flex:0 0 48px; text-align:center; align-self:flex-start; padding-right:9px; }
-      /* Gray bar, driven by the framework's own gray-70 dither (matches the
-         .meta bars in other extensions); #DDDDDD fallback for plain preview. */
-      .ca-bar    { width:var(--item-meta-width, 10px); flex:0 0 var(--item-meta-width, 10px);
-                   align-self:stretch; margin-right:15px; border-radius:3px;
-                   background-color:var(--bg-gray-70-color, #DDDDDD);
-                   background-image:var(--bg-gray-70-image, none);
-                   background-repeat:repeat; background-size:var(--dither-bg-size, auto);
-                   image-rendering:pixelated; }
+      /* Thin gray vertical bar. Self-contained dot dither (no framework vars or
+         external image, so it always renders) — reads as gray on 1-bit e-ink. */
+      .ca-bar    { width:8px; flex:0 0 8px; align-self:stretch; margin-right:15px; border-radius:3px;
+                   background-color:#fff;
+                   background-image:radial-gradient(#000 0.7px, transparent 0.8px);
+                   background-size:2px 2px; image-rendering:pixelated; }
       .ca-gnum   { font-size:30px; font-weight:600; line-height:1; }
       .ca-gdow   { font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:1px; }
 

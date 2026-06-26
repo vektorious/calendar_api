@@ -14,7 +14,7 @@ day on the right.
 The template expects the API's day-grouped endpoint, exposed in Liquid as
 `source_1`:
 
-- **URL:** `http://<server>:<port>/upcoming?days=7&max_events=8`
+- **URL:** `http://<server>:<port>/upcoming?days=7&max_events=6`
   - `days` — how many days ahead to scan.
   - `max_events` — row budget that keeps the bottom edge clean: **each event AND
     each date-only gap day counts as one row**. The endpoint fills gaps between

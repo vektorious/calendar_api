@@ -76,7 +76,7 @@ _CAL_HEADERS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"]  # week starts Monday
 @app.get("/upcoming")
 async def get_upcoming(
     days: int = Query(7, ge=1, le=31, description="How many days ahead to include (starting today)."),
-    max_events: int = Query(8, ge=1, le=50, description="Cap on total events returned, so the display never overflows."),
+    max_events: int = Query(6, ge=1, le=50, description="Row budget: each event AND each date-only gap day counts as one row, so the display never overflows."),
     _: str = Depends(require_api_key),
 ):
     """
