@@ -90,21 +90,42 @@ async def get_upcoming(
 
     today = date.today()
 
-    # Fetch every day in the window concurrently, then group.
+    # Fetch every day in the window concurrently.
     per_day = await asyncio.gather(
         *(_gather_events(today + timedelta(days=offset)) for offset in range(days))
     )
 
-    day_groups = []
-    remaining = max_events
+    # Cap how much we show so the display has a clean bottom edge. Each shown
+    # event AND each date-only gap day counts as one "row" against max_events.
+    # Gaps between event days are filled (date-only); trailing empty days after
+    # the last event are not padded on.
+    shown = []          # ordered list of (day offset, events to show)
+    used = 0
+    pending_empty = []  # gap days held until a following event day commits them
     for offset, events in enumerate(per_day):
-        if remaining <= 0:
+        if used >= max_events:
             break
         if not events:
+            pending_empty.append(offset)
             continue
+        # Need room for the intervening gap days plus at least one event.
+        if used + len(pending_empty) >= max_events:
+            break
+        for empty_offset in pending_empty:
+            shown.append((empty_offset, []))
+            used += 1
+        pending_empty = []
+        take = events[: max_events - used]
+        used += len(take)
+        shown.append((offset, take))
+
+    # If nothing is upcoming at all, still show today as a date-only row.
+    if not shown:
+        shown = [(0, [])]
+
+    day_groups = []
+    for offset, events in shown:
         d = today + timedelta(days=offset)
-        trimmed = events[:remaining]
-        remaining -= len(trimmed)
         day_groups.append({
             "day": d.day,
             "weekday_short": _WEEKDAY_SHORT[d.weekday()],
@@ -116,7 +137,7 @@ async def get_upcoming(
                     "all_day": e.all_day,
                     "source": e.source,
                 }
-                for e in trimmed
+                for e in events
             ],
         })
 

@@ -14,9 +14,12 @@ day on the right.
 The template expects the API's day-grouped endpoint, exposed in Liquid as
 `source_1`:
 
-- **URL:** `http://<server>:<port>/upcoming?days=7`
-  (optionally `&max_events=8` — the count cap that keeps the bottom edge clean;
-  raise/lower it to fit more/fewer rows).
+- **URL:** `http://<server>:<port>/upcoming?days=7&max_events=8`
+  - `days` — how many days ahead to scan.
+  - `max_events` — row budget that keeps the bottom edge clean: **each event AND
+    each date-only gap day counts as one row**. The endpoint fills gaps between
+    event days (so the day sequence is continuous), drops trailing empty days,
+    and always shows today. Lower/raise to fit fewer/more rows.
 - **Headers (hash):** `{"X-API-Key": "<your terminus key>"}`
 - **Polling:** every 15–30 min is plenty for e-ink.
 
