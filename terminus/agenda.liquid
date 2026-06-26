@@ -1,0 +1,101 @@
+{%- comment -%}
+  Terminus extension template — landscape (800x480) daily agenda.
+  Data source: GET /upcoming?days=7  (exposed in Liquid as `source_1`).
+  Uses the TRMNL framework's default (built-in) font; scoped custom CSS for the
+  pixel layout. Adjust the count cap via the API's max_events query param.
+{%- endcomment -%}
+<div class="{{ extension.css_classes }}">
+  <div class="view view--full">
+    <style>
+      .ca-screen { display:flex; height:100%; box-sizing:border-box; padding:6px 10px; }
+
+      /* Left: big "today" date + mini month calendar */
+      .ca-today { width:200px; flex:0 0 200px; padding-right:30px; }
+      .ca-num   { font-size:122px; line-height:0.9; font-weight:800; letter-spacing:-3px; }
+      .ca-dow   { font-size:30px; font-weight:600; margin-top:8px; }
+      .ca-moy   { font-size:18px; font-weight:500; margin-top:2px; }
+
+      .ca-cal      { margin-top:22px; width:168px; }
+      .ca-row      { display:flex; }
+      .ca-row > span { width:24px; height:23px; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:500; }
+      .ca-head     { border-bottom:2px solid #000; padding-bottom:2px; margin-bottom:3px; }
+      .ca-head > span { font-size:11px; font-weight:700; }
+      .ca-mark     { width:21px; height:21px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; font-style:normal; }
+      .ca-mark--today { background:#000; color:#fff; font-weight:700; }
+
+      /* Right: day-grouped agenda */
+      .ca-agenda { flex:1 1 auto; padding-left:44px; overflow:hidden; }
+      .ca-dg     { display:flex; margin-bottom:26px; }
+      .ca-gut    { width:48px; flex:0 0 48px; text-align:center; border-right:3px solid #000; padding-right:9px; margin-right:15px; }
+      .ca-gnum   { font-size:30px; font-weight:600; line-height:1; }
+      .ca-gdow   { font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:1px; }
+
+      .ca-events { flex:1 1 auto; }
+      .ca-ev     { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:15px; }
+      .ca-l      { padding-right:12px; }
+      .ca-r      { text-align:right; white-space:nowrap; }
+      .ca-title  { font-size:18px; font-weight:700; line-height:1.1; }
+      .ca-sub    { font-size:12px; font-weight:500; margin-top:1px; }
+      .ca-time   { font-size:18px; font-weight:700; line-height:1.1; }
+      .ca-end    { font-size:12px; font-weight:500; margin-top:1px; }
+    </style>
+
+    <div class="ca-screen">
+
+      {%- comment -%} LEFT: today's big date + mini month {%- endcomment -%}
+      <div class="ca-today">
+        <div class="ca-num">{{ source_1.today.day }}</div>
+        <div class="ca-dow">{{ source_1.today.weekday_long }}</div>
+        <div class="ca-moy">{{ source_1.today.month_long }} {{ source_1.today.year }}</div>
+
+        <div class="ca-cal">
+          <div class="ca-row ca-head">
+            {% for h in source_1.calendar.weekday_headers %}<span>{{ h }}</span>{% endfor %}
+          </div>
+          {% for week in source_1.calendar.weeks %}
+            <div class="ca-row">
+              {% for d in week %}
+                {% if d == 0 %}<span></span>
+                {% elsif d == source_1.calendar.today %}<span><i class="ca-mark ca-mark--today">{{ d }}</i></span>
+                {% else %}<span><i class="ca-mark">{{ d }}</i></span>{% endif %}
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {%- comment -%} RIGHT: upcoming events grouped by day {%- endcomment -%}
+      <div class="ca-agenda">
+        {% for day in source_1.days %}
+          <div class="ca-dg">
+            <div class="ca-gut">
+              <div class="ca-gnum">{{ day.day }}</div>
+              <div class="ca-gdow">{{ day.weekday_short }}</div>
+            </div>
+            <div class="ca-events">
+              {% for event in day.events %}
+                <div class="ca-ev">
+                  <div class="ca-l">
+                    <div class="ca-title">{{ event.name }}</div>
+                    <div class="ca-sub">{{ event.source }}</div>
+                  </div>
+                  <div class="ca-r">
+                    {% if event.all_day %}
+                      <div class="ca-time">All day</div>
+                    {% else %}
+                      <div class="ca-time">{{ event.start | date: "%H:%M" }}</div>
+                      {% if event.end %}<div class="ca-end">{{ event.end | date: "%H:%M" }}</div>{% endif %}
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          <div class="ca-title">No upcoming events</div>
+        {% endfor %}
+      </div>
+
+    </div>
+  </div>
+</div>
