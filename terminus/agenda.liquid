@@ -1,18 +1,9 @@
-{%- comment -%}
-  Terminus extension template — landscape (800x480) daily agenda.
-  Data source: GET /upcoming?days=7  (exposed in Liquid as `source_1`).
-  Uses the TRMNL framework's default (built-in) font; scoped custom CSS for the
-  pixel layout. Adjust the count cap via the API's max_events query param.
-{%- endcomment -%}
 <div class="{{ extension.css_classes }}">
   <div class="view view--full">
     <style>
-      /* Inter (the framework's scalable Default font) — clean at our custom
-         sizes, unlike the bitmap families which only look right at preset sizes. */
       .ca-screen { display:flex; height:100%; box-sizing:border-box; padding:8px 8px 4px 14px;
                    font-family:"Inter Variable", Inter, system-ui, sans-serif; }
 
-      /* Left: big "today" date + mini month calendar */
       .ca-today { width:200px; flex:0 0 200px; padding-right:30px; }
       .ca-num   { font-size:122px; line-height:0.9; font-weight:800; letter-spacing:-3px; }
       .ca-dow   { font-size:30px; font-weight:600; margin-top:8px; }
@@ -26,13 +17,10 @@
       .ca-mark     { width:21px; height:21px; display:inline-flex; align-items:center; justify-content:center; border-radius:50%; font-style:normal; }
       .ca-mark--today { background:#000; color:#fff; font-weight:700; }
 
-      /* Right: day-grouped agenda */
       .ca-agenda { flex:1 1 auto; padding-left:28px; overflow:hidden; }
-      .ca-dg     { display:flex; margin-bottom:22px; }
+      .ca-dg     { display:flex; margin-bottom:22px; line-height:normal; width:100%; }
       .ca-dg:last-child { margin-bottom:0; }
       .ca-gut    { width:48px; flex:0 0 48px; text-align:center; align-self:flex-start; padding-right:9px; }
-      /* Bar = the framework's own .meta element (same one the other extensions
-         use), so it dithers identically. Just give it our spacing. */
       .ca-dg > .meta { align-self:stretch; margin-right:15px; }
       .ca-gnum   { font-size:30px; font-weight:600; line-height:1; }
       .ca-gdow   { font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:1px; }
@@ -49,7 +37,6 @@
 
     <div class="ca-screen">
 
-      {%- comment -%} LEFT: today's big date + mini month {%- endcomment -%}
       <div class="ca-today">
         <div class="ca-num">{{ source_1.today.day }}</div>
         <div class="ca-dow">{{ source_1.today.weekday_long }}</div>
@@ -71,11 +58,9 @@
         </div>
       </div>
 
-      {%- comment -%} RIGHT: upcoming events grouped by day {%- endcomment -%}
       <div class="ca-agenda">
-        {%- comment -%} Days come pre-capped and gap-filled from /upcoming {%- endcomment -%}
         {% for day in source_1.days %}
-          <div class="ca-dg">
+          <div class="ca-dg item">
             <div class="ca-gut">
               <div class="ca-gnum">{{ day.day }}</div>
               <div class="ca-gdow">{{ day.weekday_short }}</div>
